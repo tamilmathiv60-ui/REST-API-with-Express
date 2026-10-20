@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#090b12">
+  <title>StackSpace — Internship Dashboard</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="ambient ambient-one"></div>
+  <div class="ambient ambient-two"></div>
+
+  <header class="topbar">
+    <a class="brand" href="#" aria-label="StackSpace home">
+      <span class="brand-mark">S<span>.</span></span>
+      <span>stack<span class="brand-light">space</span></span>
+    </a>
+
+    <div class="account">
+      <button class="certificate-link" id="certificateBtn" type="button">
+        <span aria-hidden="true">✦</span> View your certificate <span class="chevron">⌄</span>
+      </button>
+      <div class="profile">
+        <div class="avatar">TM</div>
+        <div class="profile-copy">
+          <strong>Tamil Mathi.V</strong>
+          <small>Student dashboard</small>
+        </div>
+      </div>
+      <button class="signout-btn" id="signoutBtn" type="button">↪ <span>Sign out</span></button>
+    </div>
+  </header>
+
+  <main class="page-shell">
+    <section class="welcome-row">
+      <div>
+        <p class="eyebrow">YOUR LEARNING SPACE</p>
+        <h1>Build things. <span>Become unstoppable.</span></h1>
+        <p class="subheading">Your projects, your progress, your next big skill.</p>
+      </div>
+      <div class="progress-card">
+        <div class="progress-top"><span>TRACK PROGRESS</span><strong id="progressText">0 / 5 tasks</strong></div>
+        <div class="progress-track"><div id="progressBar"></div></div>
+        <small id="progressHint">One small step at a time ✨</small>
+      </div>
+    </section>
+
+    <section class="section-heading">
+      <div><p class="eyebrow">FULL STACK DEVELOPMENT</p><h2>Your task board<span class="live-dot"></span></h2></div>
+      <label class="search-box"><span aria-hidden="true">⌕</span><input id="searchInput" type="search" placeholder="Find a task..." aria-label="Search tasks"></label>
+    </section>
+
+    <div class="filter-row" role="group" aria-label="Filter tasks">
+      <button class="filter-btn active" data-filter="all">All tasks <span>5</span></button>
+      <button class="filter-btn" data-filter="available">Available</button>
+      <button class="filter-btn" data-filter="in-progress">In progress</button>
+      <button class="filter-btn" data-filter="completed">Completed</button>
+    </div>
+
+    <section class="task-grid" id="taskGrid" aria-live="polite"></section>
+
+    <footer class="footer"><span>Made for your next chapter <span class="pink">♥</span></span><span>STACKSPACE / LEARN BY BUILDING</span></footer>
+  </main>
+
+  <dialog class="task-dialog" id="taskDialog">
+    <button class="dialog-close" id="dialogClose" aria-label="Close details">×</button>
+    <p class="eyebrow" id="dialogNumber">TASK 02</p>
+    <h2 id="dialogTitle">REST API with Express</h2>
+    <p class="dialog-description" id="dialogDescription"></p>
+    <h3>WHAT YOU'LL BUILD</h3>
+    <ul id="dialogBullets"></ul>
+    <div class="expected"><span>EXPECTED OUTCOME</span><p id="dialogOutcome"></p></div>
+    <div class="dialog-actions">
+      <button class="btn btn-secondary" id="dialogBrief">↗ Project brief</button>
+      <button class="btn btn-primary" id="dialogStart">Start task ↗</button>
+    </div>
+  </dialog>
+  <div class="toast" id="toast" role="status"></div>
+  <script src="script.js"></script>
+</body>
+</html>
