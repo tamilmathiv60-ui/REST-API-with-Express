@@ -1,81 +1,93 @@
-const express = require('express');
-const path = require('path');
+const express = require("express");
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+app.use(express.json());
 
-app.use(express.json()); // JSON in
-app.use(express.static(path.join(__dirname, 'public'))); // demo page
-
-// In-memory store for the "books" resource
-let books = [
-  { id: 1, title: 'Clean Code', author: 'Robert C. Martin', year: 2008 },
-  { id: 2, title: 'The Pragmatic Programmer', author: 'Andrew Hunt', year: 1999 },
+let records = [
+  { id: 1, name: "Tamil", course: "BCA" }
 ];
-let nextId = 3;
+let nextId = 2;
 
-function validate(body, partial = false) {
-  const errors = [];
-  const { title, author, year } = body || {};
-  if (!partial || title !== undefined)
-    if (typeof title !== 'string' || !title.trim()) errors.push('title must be a non-empty string');
-  if (!partial || author !== undefined)
-    if (typeof author !== 'string' || !author.trim()) errors.push('author must be a non-empty string');
-  if (year !== undefined && !Number.isInteger(year)) errors.push('year must be an integer');
-  return errors;
-}
-
-// GET all
-app.get('/api/books', (req, res) => {
-  res.status(200).json(books);
+app.get("/", (req, res) => {
+  res.json({ message: "REST API is working!" });
 });
 
-// GET one
-app.get('/api/books/:id', (req, res) => {
-  const book = books.find((b) => b.id === Number(req.params.id));
-  if (!book) return res.status(404).json({ error: 'Book not found' });
-  res.status(200).json(book);
+app.get("/api/records", (req, res) => {
+  res.status(200).json(records);
 });
 
-// POST create
-app.post('/api/books', (req, res) => {
-  const errors = validate(req.body);
-  if (errors.length) return res.status(400).json({ errors });
-  const { title, author, year } = req.body;
-  const book = { id: nextId++, title: title.trim(), author: author.trim(), year };
-  books.push(book);
-  res.status(201).location(`/api/books/${book.id}`).json(book);
+app.get("/api/records/:id", (req, res) => {
+  const record = records.find(
+    item => item.id === Number(req.params.id)
+  );
+
+  if (!record) {
+    return res.status(404).json({ error: "Record not found" });
+  }
+
+  res.json(record);
 });
 
-// PUT update (full replace of title/author/year)
-app.put('/api/books/:id', (req, res) => {
-  const book = books.find((b) => b.id === Number(req.params.id));
-  if (!book) return res.status(404).json({ error: 'Book not found' });
-  const errors = validate(req.body);
-  if (errors.length) return res.status(400).json({ errors });
-  const { title, author, year } = req.body;
-  book.title = title.trim();
-  book.author = author.trim();
-  book.year = year;
-  res.status(200).json(book);
+app.post("/api/records", (req, res) => {
+  const { name, course } = req.body;
+
+  if (typeof name !== "string" || !name.trim() ||
+      typeof course !== "string" || !course.trim()) {
+    return res.status(400).json({
+      error: "Name and course are required"
+    });
+  }
+
+  const record = {
+    id: nextId++,
+    name: name.trim(),
+    course: course.trim()
+  };
+
+  records.push(record);
+  res.status(201).json(record);
 });
 
-// DELETE
-app.delete('/api/books/:id', (req, res) => {
-  const idx = books.findIndex((b) => b.id === Number(req.params.id));
-  if (idx === -1) return res.status(404).json({ error: 'Book not found' });
-  const [removed] = books.splice(idx, 1);
-  res.status(200).json({ message: 'Book deleted', book: removed });
+app.put("/api/records/:id", (req, res) => {
+  const record = records.find(
+    item => item.id === Number(req.params.id)
+  );
+
+  if (!record) {
+    return res.status(404).json({ error: "Record not found" });
+  }
+
+  const { name, course } = req.body;
+
+  if (typeof name !== "string" || !name.trim() ||
+      typeof course !== "string" || !course.trim()) {
+    return res.status(400).json({
+      error: "Name and course are required"
+    });
+  }
+
+  record.name = name.trim();
+  record.course = course.trim();
+  res.json(record);
 });
 
-// Unknown API routes -> JSON 404
-app.use('/api', (req, res) => res.status(404).json({ error: 'Route not found' }));
+app.delete("/api/records/:id", (req, res) => {
+  const index = records.findIndex(
+    item => item.id === Number(req.params.id)
+  );
 
-// Malformed JSON and other errors -> JSON
-app.use((err, req, res, next) => {
-  if (err.type === 'entity.parse.failed') return res.status(400).json({ error: 'Invalid JSON body' });
-  console.error(err);
-  res.status(500).json({ error: 'Internal server error' });
+  if (index === -1) {
+    return res.status(404).json({ error: "Record not found" });
+  }
+
+  const deleted = records.splice(index, 1)[0];
+  res.json({ message: "Record deleted", record: deleted });
 });
 
-app.listen(PORT, () => console.log(`Server running at http://localhost:${PORT}`));
+app.use((req, res) => {
+  res.status(404).json({ error: "Route not found" });
+});
+
+app.listen(3000, () => {
+  console.log("Server running at http://localhost:3000");
+});
