@@ -1,93 +1,118 @@
 const express = require("express");
+const path = require("path");
 
 const app = express();
+const PORT = process.env.PORT || 3000;
+
 app.use(express.json());
 
-let records = [
-  { id: 1, name: "Tamil", course: "BCA" }
+// Serve the website files
+app.use(express.static(__dirname));
+
+// Temporary books collection
+let books = [
+  { id: 1, title: "Wings of Fire", author: "A. P. J. Abdul Kalam", year: 1999 }
 ];
+
 let nextId = 2;
 
+// Home page
 app.get("/", (req, res) => {
-  res.json({ message: "REST API is working!" });
+  res.sendFile(path.join(__dirname, "index.html"));
 });
 
-app.get("/api/records", (req, res) => {
-  res.status(200).json(records);
+// GET all books
+app.get("/api/books", (req, res) => {
+  res.status(200).json(books);
 });
 
-app.get("/api/records/:id", (req, res) => {
-  const record = records.find(
-    item => item.id === Number(req.params.id)
-  );
+// GET one book
+app.get("/api/books/:id", (req, res) => {
+  const book = books.find(b => b.id === Number(req.params.id));
 
-  if (!record) {
-    return res.status(404).json({ error: "Record not found" });
+  if (!book) {
+    return res.status(404).json({ error: "Book not found" });
   }
 
-  res.json(record);
+  res.status(200).json(book);
 });
 
-app.post("/api/records", (req, res) => {
-  const { name, course } = req.body;
+// POST a new book
+app.post("/api/books", (req, res) => {
+  const { title, author, year } = req.body;
 
-  if (typeof name !== "string" || !name.trim() ||
-      typeof course !== "string" || !course.trim()) {
+  if (
+    typeof title !== "string" || !title.trim() ||
+    typeof author !== "string" || !author.trim() ||
+    !Number.isInteger(Number(year)) ||
+    String(year).trim() === ""
+  ) {
     return res.status(400).json({
-      error: "Name and course are required"
+      error: "Valid title, author and year are required"
     });
   }
 
-  const record = {
+  const book = {
     id: nextId++,
-    name: name.trim(),
-    course: course.trim()
+    title: title.trim(),
+    author: author.trim(),
+    year: Number(year)
   };
 
-  records.push(record);
-  res.status(201).json(record);
+  books.push(book);
+  res.status(201).json(book);
 });
 
-app.put("/api/records/:id", (req, res) => {
-  const record = records.find(
-    item => item.id === Number(req.params.id)
-  );
+// PUT: Update a book
+app.put("/api/books/:id", (req, res) => {
+  const book = books.find(b => b.id === Number(req.params.id));
 
-  if (!record) {
-    return res.status(404).json({ error: "Record not found" });
+  if (!book) {
+    return res.status(404).json({ error: "Book not found" });
   }
 
-  const { name, course } = req.body;
+  const { title, author, year } = req.body;
 
-  if (typeof name !== "string" || !name.trim() ||
-      typeof course !== "string" || !course.trim()) {
+  if (
+    typeof title !== "string" || !title.trim() ||
+    typeof author !== "string" || !author.trim() ||
+    !Number.isInteger(Number(year)) ||
+    String(year).trim() === ""
+  ) {
     return res.status(400).json({
-      error: "Name and course are required"
+      error: "Valid title, author and year are required"
     });
   }
 
-  record.name = name.trim();
-  record.course = course.trim();
-  res.json(record);
+  book.title = title.trim();
+  book.author = author.trim();
+  book.year = Number(year);
+
+  res.status(200).json(book);
 });
 
-app.delete("/api/records/:id", (req, res) => {
-  const index = records.findIndex(
-    item => item.id === Number(req.params.id)
+// DELETE a book
+app.delete("/api/books/:id", (req, res) => {
+  const index = books.findIndex(
+    b => b.id === Number(req.params.id)
   );
 
   if (index === -1) {
-    return res.status(404).json({ error: "Record not found" });
+    return res.status(404).json({ error: "Book not found" });
   }
 
-  const deleted = records.splice(index, 1)[0];
-  res.json({ message: "Record deleted", record: deleted });
+  const deleted = books.splice(index, 1)[0];
+  res.status(200).json({
+    message: "Book deleted successfully",
+    book: deleted
+  });
 });
 
+// Handle unknown routes
 app.use((req, res) => {
   res.status(404).json({ error: "Route not found" });
 });
 
-app.listen(3000, () => {
-  console.log("Server running at http://localhost:3000");
+app.listen(PORT, "0.0.0.0", () => {
+  console.log(`Books API running on port ${PORT}`);
 });
