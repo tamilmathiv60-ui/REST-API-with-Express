@@ -1,12 +1,13 @@
 {
   "name": "rest-api-with-express",
   "version": "1.0.0",
-  "description": "Books REST API using Express",
+  "description": "Books REST API",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"
   },
   "dependencies": {
-    "express": "^4.21.2"
+    "express": "^4.21.2",
+    "pg": "^8.16.3"
   }
 }
